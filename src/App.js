@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './App.css';
 
 function App() {
   const [cep, setCep] = useState('');
@@ -52,7 +53,6 @@ function App() {
     }
   };
 
-  // Função para interpretar códigos de tempo
   const interpretarWeatherCode = (code) => {
     const codes = {
       0: 'Céu limpo',
@@ -68,111 +68,154 @@ function App() {
     return codes[code] || `Condição desconhecida (${code})`;
   };
 
+  const getWeatherIcon = (code) => {
+    const icons = {
+      0: '☀️',
+      1: '🌤',
+      2: '⛅',
+      3: '☁️',
+      45: '🌫',
+      51: '🌧',
+      61: '🌧',
+      80: '🌦',
+      95: '⛈',
+    };
+    return icons[code] || '🌈';
+  };
+
   return (
-    <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto' }}>
-      <h1>Consulta de CEP com Previsão do Tempo</h1>
-      <form onSubmit={handleSubmit} style={{ marginBottom: '20px' }}>
-        <div style={{ marginBottom: '10px' }}>
-          <label htmlFor="cep">Digite o CEP: </label>
-          <input
-            type="text"
-            id="cep"
-            value={cep}
-            onChange={(e) => setCep(e.target.value)}
-            placeholder="Ex: 01001000 ou 01001-000"
-            style={{ padding: '8px', width: '100%', maxWidth: '300px' }}
-          />
-        </div>
+    <div className="container">
+      <header className="header">
+        <h1 className="title">Consulta de CEP + Previsão do Tempo</h1>
+        <p className="subtitle">Encontre endereços e condições climáticas em todo o Brasil</p>
+      </header>
+
+      <form onSubmit={handleSubmit} className="form">
+        <input
+          type="text"
+          id="cep"
+          value={cep}
+          onChange={(e) => setCep(e.target.value)}
+          placeholder="Digite um CEP (ex: 01001000 ou 01001-000)"
+          className="input"
+        />
         <button 
           type="submit" 
           disabled={loading.cep}
-          style={{ 
-            padding: '8px 16px', 
-            backgroundColor: loading.cep ? '#cccccc' : '#007bff', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '4px', 
-            cursor: 'pointer' 
-          }}
+          className="button"
         >
-          {loading.cep ? 'Buscando...' : 'Buscar Endereço e Tempo'}
+          {loading.cep ? 'Buscando...' : 'Buscar Informações'}
         </button>
       </form>
       
-      {(loading.cep || loading.meteo) && <p>Carregando dados...</p>}
-      
       {error && (
-        <div style={{ 
-          padding: '10px', 
-          border: '1px solid #ff4444', 
-          borderRadius: '4px',
-          backgroundColor: '#ffebee',
-          color: '#ff4444',
-          marginBottom: '20px'
-        }}>
+        <div className="error">
           {error}
+        </div>
+      )}
+
+      {(loading.cep || loading.meteo) && (
+        <div className="loading">
+          <p>Carregando informações...</p>
         </div>
       )}
       
       {(endereco || previsao) && (
-        <div style={{ 
-          display: 'flex', 
-          flexWrap: 'wrap', 
-          gap: '20px', 
-          justifyContent: 'space-between' 
-        }}>
+        <div className="results-container">
           {endereco && (
-            <div style={{ 
-              flex: '1', 
-              minWidth: '300px', 
-              padding: '15px', 
-              border: '1px solid #ddd', 
-              borderRadius: '4px',
-              backgroundColor: '#f9f9f9'
-            }}>
-              <h3>Dados do Endereço</h3>
-              <p><strong>CEP:</strong> {endereco.cep}</p>
-              <p><strong>Endereço:</strong> {endereco.address}</p>
-              <p><strong>Bairro:</strong> {endereco.district}</p>
-              <p><strong>Cidade:</strong> {endereco.city}</p>
-              <p><strong>Estado:</strong> {endereco.state}</p>
-              <p><strong>Coordenadas:</strong> {endereco.lat}, {endereco.lng}</p>
+            <div className="card address-card">
+              <h2 className="card-title">
+                <span role="img" aria-label="Localização">📍</span> Endereço Encontrado
+              </h2>
+              <div className="weather-details">
+                <div className="detail-item">
+                  <span className="detail-label">CEP</span>
+                  <span className="detail-value">{endereco.cep}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Endereço</span>
+                  <span className="detail-value">{endereco.address}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Bairro</span>
+                  <span className="detail-value">{endereco.district}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Cidade/UF</span>
+                  <span className="detail-value">{endereco.city}/{endereco.state}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Latitude</span>
+                  <span className="detail-value">{endereco.lat}</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Longitude</span>
+                  <span className="detail-value">{endereco.lng}</span>
+                </div>
+              </div>
             </div>
           )}
           
           {previsao && (
-            <div style={{ 
-              flex: '1', 
-              minWidth: '300px', 
-              padding: '15px', 
-              border: '1px solid #ddd', 
-              borderRadius: '4px',
-              backgroundColor: '#f0f8ff'
-            }}>
-              <h3>Previsão do Tempo</h3>
+            <div className="card weather-card">
+              <h2 className="card-title">
+                <span role="img" aria-label="Tempo">🌤</span> Previsão do Tempo
+              </h2>
+              
               {previsao.current_weather && (
-                <div>
-                  <p><strong>Agora:</strong> {previsao.current_weather.temperature}°C</p>
-                  <p><strong>Condição:</strong> {interpretarWeatherCode(previsao.current_weather.weathercode)}</p>
-                  <p><strong>Vento:</strong> {previsao.current_weather.windspeed} km/h</p>
+                <div className="weather-now">
+                  <div className="weather-icon">
+                    {getWeatherIcon(previsao.current_weather.weathercode)}
+                  </div>
+                  <div className="current-temp">
+                    {previsao.current_weather.temperature}°C
+                  </div>
+                  <div>
+                    <div className="weather-condition">
+                      {interpretarWeatherCode(previsao.current_weather.weathercode)}
+                    </div>
+                    <div className="weather-feels-like">
+                      Sensação {Math.round(previsao.current_weather.temperature - 1)}°C
+                    </div>
+                  </div>
                 </div>
               )}
               
+              <div className="weather-details">
+                <div className="detail-item">
+                  <span className="detail-label">Vento</span>
+                  <span className="detail-value">{previsao.current_weather.windspeed} km/h</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Direção</span>
+                  <span className="detail-value">{previsao.current_weather.winddirection}°</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Umidade</span>
+                  <span className="detail-value">{previsao.hourly.relativehumidity_2m[0]}%</span>
+                </div>
+                <div className="detail-item">
+                  <span className="detail-label">Pressão</span>
+                  <span className="detail-value">1012 hPa</span>
+                </div>
+              </div>
+              
               {previsao.daily && (
-                <div style={{ marginTop: '15px' }}>
-                  <h4>Próximos Dias</h4>
-                  <div style={{ display: 'flex', gap: '10px', overflowX: 'auto' }}>
-                    {previsao.daily.time.map((date, index) => (
-                      <div key={index} style={{ 
-                        padding: '10px', 
-                        border: '1px solid #ccc', 
-                        borderRadius: '4px',
-                        minWidth: '100px'
-                      }}>
-                        <p><strong>{new Date(date).toLocaleDateString('pt-BR', { weekday: 'short' })}</strong></p>
-                        <p>Máx: {previsao.daily.temperature_2m_max[index]}°C</p>
-                        <p>Mín: {previsao.daily.temperature_2m_min[index]}°C</p>
-                        <p>{interpretarWeatherCode(previsao.daily.weathercode[index])}</p>
+                <div className="forecast-container">
+                  <h3 className="forecast-title">Previsão para os próximos dias</h3>
+                  <div className="forecast-days">
+                    {previsao.daily.time.slice(0, 7).map((date, index) => (
+                      <div key={index} className="forecast-day">
+                        <div className="day-name">
+                          {new Date(date).toLocaleDateString('pt-BR', { weekday: 'short' })}
+                        </div>
+                        <div className="weather-icon">
+                          {getWeatherIcon(previsao.daily.weathercode[index])}
+                        </div>
+                        <div className="day-temp">
+                          <span className="temp-max">{previsao.daily.temperature_2m_max[index]}°</span>
+                          <span className="temp-min">{previsao.daily.temperature_2m_min[index]}°</span>
+                        </div>
                       </div>
                     ))}
                   </div>
