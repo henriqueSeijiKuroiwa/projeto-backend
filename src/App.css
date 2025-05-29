@@ -1,5 +1,10 @@
 .App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
   text-align: center;
+  margin: 30px;
 }
 
 .App-logo {
@@ -35,4 +40,15 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.Inserir-cep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: #61dafb;
+  width: 200px;
+  padding: 10px;
+  border-radius: 10px;
 }
